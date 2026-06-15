@@ -1,0 +1,8 @@
+dataset/
+dataset_dollar/
+venv/
+__pycache__/
+static/uploads/*
+*.pyc
+*.h5
+*.keras

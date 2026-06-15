@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tentang – OrangDesaJugaNgertiDolar</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #f8faff; }
+    .navbar { background: #fff; border-bottom: 1px solid #e2e8f0; }
+    .navbar-brand span { color: #1a56db; }
+    .card { border: 1px solid #e2e8f0; border-radius: 16px; }
+    .arch-step {
+      display: flex; align-items: flex-start; gap: 16px;
+      padding: 14px 0; border-bottom: 1px solid #e2e8f0;
+    }
+    .arch-step:last-child { border-bottom: none; }
+    .arch-num {
+      min-width: 36px; height: 36px; border-radius: 50%;
+      background: #e8f0fe; color: #1a56db;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .9rem;
+    }
+    footer { background: #1e293b; color: #94a3b8; padding: 28px 0; font-size: .88rem; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="/">
+        <i class="bi bi-currency-exchange me-2" style="color:#1a56db"></i>OrangDesaJugaNgertiDolar
+      </a>
+      <a href="/" class="btn btn-outline-primary btn-sm ms-auto">
+        <i class="bi bi-arrow-left me-1"></i>Kembali
+      </a>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    <h2 class="fw-bold mb-1">Tentang OrangDesaJugaNgertiDolar</h2>
+    <p class="text-muted mb-4">Sistem Klasifikasi Nominal Uang Kertas Rupiah Berbasis CNN</p>
+
+    <div class="row g-4">
+      <!-- Deskripsi -->
+      <div class="col-lg-7">
+        <div class="card p-4 mb-4">
+          <h5 class="fw-semibold mb-3"><i class="bi bi-info-circle me-2 text-primary"></i>Deskripsi Sistem</h5>
+          <p>OrangDesaJugaNgertiDolar adalah aplikasi web berbasis kecerdasan buatan yang mampu mengklasifikasikan nominal uang kertas Rupiah Indonesia secara otomatis dari gambar yang diunggah pengguna.</p>
+          <p class="mb-0">Sistem ini menggunakan arsitektur <strong>MobileNetV2</strong> dengan pendekatan <strong>Transfer Learning</strong> dari ImageNet, yang kemudian di-fine-tune menggunakan dataset gambar uang kertas Rupiah emisi terbaru. Dengan arsitektur yang ringan namun akurat, model ini cocok untuk dijalankan di lingkungan web maupun perangkat mobile.</p>
+        </div>
+
+        <div class="card p-4">
+          <h5 class="fw-semibold mb-3"><i class="bi bi-diagram-3 me-2 text-primary"></i>Arsitektur Model CNN</h5>
+          <div class="arch-step">
+            <div class="arch-num">1</div>
+            <div><strong>Input Layer</strong><br><span class="text-muted small">Gambar RGB 224×224 piksel, dinormalisasi ke [0,1]</span></div>
+          </div>
+          <div class="arch-step">
+            <div class="arch-num">2</div>
+            <div><strong>MobileNetV2 Base (Frozen → Fine-tuned)</strong><br><span class="text-muted small">154 layer konvolusi depthwise separable, pretrained ImageNet</span></div>
+          </div>
+          <div class="arch-step">
+            <div class="arch-num">3</div>
+            <div><strong>GlobalAveragePooling2D</strong><br><span class="text-muted small">Meratakan feature map menjadi vektor 1D</span></div>
+          </div>
+          <div class="arch-step">
+            <div class="arch-num">4</div>
+            <div><strong>Dense (256) + BatchNorm + Dropout 0.4</strong><br><span class="text-muted small">Fully connected layer dengan regularisasi</span></div>
+          </div>
+          <div class="arch-step">
+            <div class="arch-num">5</div>
+            <div><strong>Dense (128) + Dropout 0.3</strong><br><span class="text-muted small">Lapisan fully connected kedua</span></div>
+          </div>
+          <div class="arch-step">
+            <div class="arch-num">6</div>
+            <div><strong>Output Layer – Softmax (7 kelas)</strong><br><span class="text-muted small">Rp1.000 / Rp2.000 / Rp5.000 / Rp10.000 / Rp20.000 / Rp50.000 / Rp100.000</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar Info -->
+      <div class="col-lg-5">
+        <div class="card p-4 mb-4">
+          <h5 class="fw-semibold mb-3"><i class="bi bi-tools me-2 text-primary"></i>Teknologi yang Digunakan</h5>
+          <ul class="list-unstyled mb-0">
+            <li class="py-2 border-bottom"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>TensorFlow / Keras</strong> — Training model CNN</li>
+            <li class="py-2 border-bottom"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>MobileNetV2</strong> — Arsitektur Transfer Learning</li>
+            <li class="py-2 border-bottom"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Flask</strong> — Backend web framework Python</li>
+            <li class="py-2 border-bottom"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Bootstrap 5</strong> — Frontend UI/UX</li>
+            <li class="py-2 border-bottom"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>scikit-learn</strong> — Evaluasi model (confusion matrix)</li>
+            <li class="py-2"><i class="bi bi-check-circle-fill text-success me-2"></i><strong>Kaggle Dataset</strong> — Rupiah Banknotes Dataset</li>
+          </ul>
+        </div>
+
+        <div class="card p-4 mb-4">
+          <h5 class="fw-semibold mb-3"><i class="bi bi-cash-stack me-2 text-primary"></i>Kelas yang Didukung</h5>
+          <div class="row g-2">
+            {% set nominals = [("Rp 1.000","Abu-abu"),("Rp 2.000","Abu-abu"),("Rp 5.000","Coklat"),("Rp 10.000","Ungu"),("Rp 20.000","Hijau"),("Rp 50.000","Biru"),("Rp 100.000","Merah")] %}
+            {% for nom, warna in nominals %}
+            <div class="col-6">
+              <div class="p-2 rounded text-center" style="background:#f0f7ff; font-size:.88rem;">
+                <div class="fw-semibold">{{ nom }}</div>
+                <div class="text-muted small">{{ warna }}</div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="card p-4">
+          <h5 class="fw-semibold mb-3"><i class="bi bi-mortarboard me-2 text-primary"></i>Informasi Akademik</h5>
+          <table class="table table-sm table-borderless mb-0">
+            <tr><td class="text-muted">Mata Kuliah</td><td class="fw-semibold">Praktikum Kecerdasan Buatan</td></tr>
+            <tr><td class="text-muted">Kampus</td><td>Universitas Bale Bandung</td></tr>
+            <tr><td class="text-muted">Program Studi</td><td>Teknik Informatika</td></tr>
+            <tr><td class="text-muted">Tugas</td><td>Tugas 10 – CNN Web App</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container text-center">
+      <p class="mb-0">OrangDesaJugaNgertiDolar &copy; 2024 · Teknik Informatika UNIBBA</p>
+    </div>
+  </footer>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

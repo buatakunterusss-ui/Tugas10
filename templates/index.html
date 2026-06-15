@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OrangDesaJugaNgertiDolar – Klasifikasi Uang Kertas</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root { --primary:#1a56db; --primary-light:#e8f0fe; --bg:#f8faff; --border:#e2e8f0; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:#1e293b; }
+    .navbar { background:#fff; border-bottom:1px solid var(--border); }
+    .navbar-brand span { color:var(--primary); }
+    .hero {
+      background:linear-gradient(135deg,#1a56db 0%,#0c3893 100%);
+      color:#fff; padding:50px 0 70px; position:relative; overflow:hidden;
+    }
+    .hero::after {
+      content:""; position:absolute; bottom:-1px; left:0; right:0;
+      height:50px; background:var(--bg);
+      clip-path:ellipse(55% 100% at 50% 100%);
+    }
+    .badge-ai {
+      background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35);
+      border-radius:50px; padding:6px 16px; font-size:.85rem;
+      display:inline-block; margin-bottom:16px;
+    }
+    .card { border:1px solid var(--border); border-radius:16px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+
+    /* Currency Switcher */
+    .currency-switcher { display:flex; gap:12px; margin-bottom:20px; }
+    .currency-btn {
+      flex:1; padding:12px; border-radius:12px; border:2px solid var(--border);
+      background:#fff; cursor:pointer; transition:all .2s; text-align:center;
+    }
+    .currency-btn.active {
+      border-color:var(--primary); background:var(--primary-light);
+    }
+    .currency-btn .flag { font-size:1.8rem; display:block; margin-bottom:4px; }
+    .currency-btn .name { font-size:.85rem; font-weight:600; color:#1e293b; }
+    .currency-btn.active .name { color:var(--primary); }
+
+    /* Upload */
+    .upload-zone {
+      border:2px dashed #93c5fd; border-radius:16px;
+      background:#f0f7ff; padding:40px 20px;
+      text-align:center; cursor:pointer; transition:all .25s;
+    }
+    .upload-zone:hover { border-color:var(--primary); background:var(--primary-light); }
+    .upload-zone .icon { font-size:2.8rem; color:#93c5fd; margin-bottom:10px; }
+    #previewContainer { display:none; }
+    #previewImg { max-height:260px; border-radius:12px; border:1px solid var(--border); object-fit:contain; }
+
+    /* Result */
+    #resultSection { display:none; }
+    #placeholderCard .ph-icon { font-size:4rem; color:#cbd5e1; }
+    .result-nominal { font-size:2.6rem; font-weight:700; color:var(--primary); }
+    .info-badge {
+      background:var(--primary-light); color:var(--primary);
+      border-radius:8px; padding:6px 14px; font-size:.88rem;
+      font-weight:500; display:inline-flex; align-items:center; gap:6px;
+    }
+    .top3-item {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:8px 0; border-bottom:1px solid var(--border);
+    }
+    .top3-item:last-child { border-bottom:none; }
+    #loadingSpinner { display:none; }
+
+    .step-icon {
+      width:52px; height:52px; border-radius:50%;
+      background:var(--primary-light); color:var(--primary);
+      font-size:1.4rem; display:flex; align-items:center;
+      justify-content:center; margin:0 auto 12px;
+    }
+    footer { background:#1e293b; color:#94a3b8; padding:28px 0; font-size:.88rem; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/">
+      <i class="bi bi-currency-exchange me-2" style="color:var(--primary)"></i>
+      OrangDesaJugaNgerti<span>Dolar</span>
+    </a>
+    <a href="/about" class="btn btn-outline-primary btn-sm ms-auto">
+      <i class="bi bi-info-circle me-1"></i>Tentang
+    </a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container text-center">
+    <div class="badge-ai"><i class="bi bi-cpu me-1"></i>CNN · MobileNetV2 · Transfer Learning</div>
+    <h1 class="fw-bold" style="font-size:2.2rem">Klasifikasi Nominal Uang Kertas</h1>
+    <p class="mt-2" style="opacity:.88">Deteksi nominal uang Rupiah 🇮🇩 dan Dollar 🇺🇸 secara otomatis menggunakan AI</p>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4 justify-content-center">
+
+    <!-- UPLOAD PANEL -->
+    <div class="col-lg-6">
+      <div class="card p-4 h-100">
+        <h5 class="fw-semibold mb-3"><i class="bi bi-upload me-2 text-primary"></i>Unggah Gambar</h5>
+
+        <!-- Currency Switcher -->
+        <p class="small text-muted mb-2 fw-semibold">Pilih Mata Uang:</p>
+        <div class="currency-switcher">
+          <div class="currency-btn active" id="btnRupiah" onclick="selectCurrency('rupiah')">
+            <span class="flag">🇮🇩</span>
+            <div class="name">Rupiah (IDR)</div>
+            <div class="text-muted" style="font-size:.75rem">Rp1.000 – Rp100.000</div>
+          </div>
+          <div class="currency-btn" id="btnDollar" onclick="selectCurrency('dollar')">
+            <span class="flag">🇺🇸</span>
+            <div class="name">Dollar (USD)</div>
+            <div class="text-muted" style="font-size:.75rem">$1 – $100</div>
+          </div>
+        </div>
+
+        <!-- Dropzone -->
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+          <div class="icon"><i class="bi bi-image"></i></div>
+          <p class="fw-semibold mb-1">Klik atau drag & drop gambar di sini</p>
+          <p class="text-muted small">Format: JPG, PNG, WEBP · Maks. 16 MB</p>
+          <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.webp" style="display:none"/>
+        </div>
+
+        <div id="previewContainer" class="text-center mt-3">
+          <img id="previewImg" src="" alt="Preview" class="img-fluid"/>
+          <p id="previewName" class="small text-muted mt-2"></p>
+        </div>
+
+        <button class="btn btn-primary w-100 mt-3 py-2 fw-semibold" id="btnPredict" disabled onclick="submitPrediction()">
+          <i class="bi bi-magic me-2"></i>Deteksi Nominal
+        </button>
+
+        <div id="loadingSpinner" class="text-center mt-3">
+          <div class="spinner-border text-primary" role="status"></div>
+          <p class="small text-muted mt-2">Memproses dengan CNN...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULT PANEL -->
+    <div class="col-lg-6">
+      <div class="card p-4 h-100" id="resultSection">
+        <h5 class="fw-semibold mb-3"><i class="bi bi-check2-circle me-2 text-success"></i>Hasil Prediksi</h5>
+        <div class="text-center mb-3">
+          <p class="text-muted small mb-1">Nominal Terdeteksi</p>
+          <div class="result-nominal" id="resultNominal">—</div>
+        </div>
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="small fw-semibold">Tingkat Kepercayaan</span>
+            <span class="small text-primary fw-bold" id="resultConfidence">0%</span>
+          </div>
+          <div class="progress" style="height:10px;border-radius:50px">
+            <div class="progress-bar bg-primary" id="progressBar" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mb-4">
+          <div class="info-badge"><i class="bi bi-palette2"></i><span id="resultWarna">—</span></div>
+          <div class="info-badge"><i class="bi bi-person"></i><span id="resultTokoh">—</span></div>
+          <div class="info-badge" id="currencyBadge"><i class="bi bi-cash"></i><span id="resultCurrency">—</span></div>
+        </div>
+        <div>
+          <p class="fw-semibold small mb-2">Top 3 Prediksi</p>
+          <div id="top3List"></div>
+        </div>
+      </div>
+
+      <div class="card p-4 h-100 text-center" id="placeholderCard">
+        <div class="my-auto">
+          <div class="ph-icon"><i class="bi bi-cash-stack"></i></div>
+          <p class="text-muted mt-3">Pilih mata uang, unggah gambar, lalu klik Deteksi Nominal.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEPS -->
+  <div class="row g-4 mt-2">
+    <div class="col-12"><h5 class="fw-semibold text-center mb-4">Cara Penggunaan</h5></div>
+    <div class="col-md-4 text-center">
+      <div class="step-icon"><i class="bi bi-toggles"></i></div>
+      <h6 class="fw-semibold">1. Pilih Mata Uang</h6>
+      <p class="text-muted small">Pilih Rupiah 🇮🇩 atau Dollar 🇺🇸 sesuai uang yang ingin dideteksi.</p>
+    </div>
+    <div class="col-md-4 text-center">
+      <div class="step-icon"><i class="bi bi-cloud-upload"></i></div>
+      <h6 class="fw-semibold">2. Unggah Gambar</h6>
+      <p class="text-muted small">Drag & drop atau klik untuk pilih foto uang kertas.</p>
+    </div>
+    <div class="col-md-4 text-center">
+      <div class="step-icon"><i class="bi bi-lightning-charge"></i></div>
+      <h6 class="fw-semibold">3. Lihat Hasil</h6>
+      <p class="text-muted small">CNN memproses gambar dan menampilkan nominal beserta tingkat kepercayaan.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container text-center">
+    <p class="mb-1">OrangDesaJugaNgertiDolar &copy; 2024 — Klasifikasi Uang Kertas Rupiah & Dollar</p>
+    <p class="mb-0 small">CNN MobileNetV2 + Flask · Teknik Informatika UNIBBA</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  let selectedCurrency = "rupiah";
+
+  function selectCurrency(c) {
+    selectedCurrency = c;
+    document.getElementById("btnRupiah").classList.toggle("active", c === "rupiah");
+    document.getElementById("btnDollar").classList.toggle("active", c === "dollar");
+  }
+
+  const fileInput   = document.getElementById("fileInput");
+  const btnPredict  = document.getElementById("btnPredict");
+  const previewCont = document.getElementById("previewContainer");
+  const previewImg  = document.getElementById("previewImg");
+  const previewName = document.getElementById("previewName");
+  const uploadZone  = document.getElementById("uploadZone");
+  const loading     = document.getElementById("loadingSpinner");
+  const resultSec   = document.getElementById("resultSection");
+  const placeholder = document.getElementById("placeholderCard");
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      previewImg.src = e.target.result;
+      previewName.textContent = file.name;
+      previewCont.style.display = "block";
+      btnPredict.disabled = false;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  uploadZone.addEventListener("dragover",  e => { e.preventDefault(); uploadZone.style.borderColor="#1a56db"; });
+  uploadZone.addEventListener("dragleave", () => { uploadZone.style.borderColor="#93c5fd"; });
+  uploadZone.addEventListener("drop", e => {
+    e.preventDefault(); uploadZone.style.borderColor="#93c5fd";
+    const file = e.dataTransfer.files[0];
+    if (file) { fileInput.files = e.dataTransfer.files; fileInput.dispatchEvent(new Event("change")); }
+  });
+
+  function submitPrediction() {
+    const file = fileInput.files[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("currency", selectedCurrency);
+
+    btnPredict.disabled = true;
+    loading.style.display = "block";
+    resultSec.style.display = "none";
+    placeholder.style.display = "none";
+
+    fetch("/predict", { method:"POST", body:fd })
+      .then(r => r.json())
+      .then(data => {
+        loading.style.display = "none";
+        btnPredict.disabled = false;
+        if (data.error) { alert("Error: "+data.error); placeholder.style.display="block"; return; }
+
+        document.getElementById("resultNominal").textContent    = data.nominal;
+        document.getElementById("resultConfidence").textContent = data.confidence+"%";
+        document.getElementById("progressBar").style.width      = data.confidence+"%";
+        document.getElementById("resultWarna").textContent      = data.warna;
+        document.getElementById("resultTokoh").textContent      = data.tokoh;
+        document.getElementById("resultCurrency").textContent   = data.currency === "rupiah" ? "🇮🇩 Rupiah" : "🇺🇸 Dollar";
+
+        const top3 = document.getElementById("top3List");
+        top3.innerHTML = "";
+        data.top3.forEach((item, i) => {
+          top3.innerHTML += `
+            <div class="top3-item">
+              <span class="fw-semibold small">#${i+1} ${item.nominal}</span>
+              <div class="d-flex align-items-center gap-2" style="width:55%">
+                <div class="progress flex-grow-1" style="height:6px">
+                  <div class="progress-bar ${i===0?'bg-primary':'bg-secondary'}" style="width:${Math.round(item.confidence)}%"></div>
+                </div>
+                <span class="small text-muted" style="min-width:42px;text-align:right">${item.confidence}%</span>
+              </div>
+            </div>`;
+        });
+        resultSec.style.display = "block";
+      })
+      .catch(err => {
+        loading.style.display = "none";
+        btnPredict.disabled = false;
+        placeholder.style.display = "block";
+        alert("Koneksi error.");
+      });
+  }
+</script>
+</body>
+</html>
